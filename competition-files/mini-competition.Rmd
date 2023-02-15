@@ -90,15 +90,25 @@ students %>%
   theme_bw()
 ```
 
-```{r non-linear}
+```{r non-linear mutations}
 # add natural log transformation to existing dataset
 students <- students %>%
   mutate(log_scholarship =  log(scholarship))
+
+students <- students %>% 
+  mutate(log_distance = log(distance))
+
+students$log_distance[!is.finite(students$log_distance)] <- 0
 ```
 
 ```{r lm}
 model <- lm(debt ~ log_scholarship, data = students)
 summary(model)
 ```
-
+```{r log lm}
+model <- lm (debt ~ log_distance + log_scholarship + parents, data = students)
+summary(model)
+model <- lm(debt ~ distance * parents + scholarship * parents, data = students)
+summary(model)
+```
 

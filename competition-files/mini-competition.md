@@ -546,6 +546,11 @@ students %>%
 # add natural log transformation to existing dataset
 students <- students %>%
   mutate(log_scholarship =  log(scholarship))
+
+students <- students %>% 
+  mutate(log_distance = log(distance))
+
+students$log_distance[!is.finite(students$log_distance)] <- 0
 ```
 
 ``` r
@@ -571,3 +576,59 @@ summary(model)
     ## Residual standard error: 7121 on 198 degrees of freedom
     ## Multiple R-squared:  0.2992, Adjusted R-squared:  0.2956 
     ## F-statistic: 84.52 on 1 and 198 DF,  p-value: < 2.2e-16
+
+``` r
+model <- lm (debt ~ log_distance + log_scholarship + parents, data = students)
+summary(model)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = debt ~ log_distance + log_scholarship + parents, 
+    ##     data = students)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -16904.2  -3135.2    218.1   3333.9  16116.0 
+    ## 
+    ## Coefficients:
+    ##                 Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)      55969.5     3218.0  17.393  < 2e-16 ***
+    ## log_distance      2396.5      323.2   7.415 3.57e-12 ***
+    ## log_scholarship  -3898.3      337.3 -11.556  < 2e-16 ***
+    ## parents         -21703.0     2862.5  -7.582 1.33e-12 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 5557 on 196 degrees of freedom
+    ## Multiple R-squared:  0.5775, Adjusted R-squared:  0.571 
+    ## F-statistic: 89.29 on 3 and 196 DF,  p-value: < 2.2e-16
+
+``` r
+model <- lm(debt ~ distance * parents + scholarship * parents, data = students)
+summary(model)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = debt ~ distance * parents + scholarship * parents, 
+    ##     data = students)
+    ## 
+    ## Residuals:
+    ##    Min     1Q Median     3Q    Max 
+    ##  -9848  -2434    220   2643  21131 
+    ## 
+    ## Coefficients:
+    ##                       Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)          4.081e+04  1.338e+03  30.510  < 2e-16 ***
+    ## distance             2.402e+01  8.282e+00   2.900  0.00416 ** 
+    ## parents             -3.402e+04  4.312e+03  -7.891 2.15e-13 ***
+    ## scholarship         -1.952e+00  1.914e-01 -10.197  < 2e-16 ***
+    ## distance:parents     5.987e+01  2.751e+01   2.176  0.03074 *  
+    ## parents:scholarship  1.484e+00  6.162e-01   2.408  0.01697 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 4218 on 194 degrees of freedom
+    ## Multiple R-squared:  0.7591, Adjusted R-squared:  0.7528 
+    ## F-statistic: 122.2 on 5 and 194 DF,  p-value: < 2.2e-16
