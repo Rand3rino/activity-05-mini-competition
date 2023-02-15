@@ -6,3 +6,99 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+### Libraries
+```{r libraries}
+library(tidyverse)
+library(tidymodels)
+library(GGally)
+```
+
+### Get Data
+```{r get_data}
+students <- read_csv("data/allendale-students.csv")
+```
+
+
+
+```{r plot debt}
+students %>% 
+  ggplot(aes(x=debt)) + 
+  geom_histogram(bins = 24) + 
+  theme_bw()
+```
+
+```{r linear models}
+model <- lm(debt ~ distance, data = students)
+tidy(model)
+summary(model)
+
+model <- lm(debt ~ scholarship, data = students)
+tidy(model)
+summary(model)
+
+model <- lm(debt ~ parents, data = students)
+tidy(model)
+summary(model)
+
+model <- lm(debt ~ car, data = students)
+tidy(model)
+summary(model)
+
+model <- lm(debt ~ housing, data = students)
+tidy(model)
+summary(model)
+
+model <- lm(debt ~ major, data = students)
+tidy(model)
+summary(model)
+```
+
+```{r mlrs}
+mlr_models <- lm(debt ~ distance + scholarship + parents , data = students)
+summary(mlr_models)
+```
+
+```{r mlr with interactions}
+mlr_models <- lm(debt ~ distance * car + scholarship + parents, data = students)
+summary(mlr_models)
+
+mlr_models <- lm(debt ~ distance * scholarship * parents , data = students)
+summary(mlr_models)
+
+mlr_models <- lm(debt ~ distance * scholarship * parents * housing, data = students)
+summary(mlr_models)
+
+mlr_models <- lm(debt ~ distance * scholarship * parents * major, data = students)
+summary(mlr_models)
+```
+
+```{r dumb down mlr}
+mlr_models <- lm(debt ~ scholarship * parents * major, data = students)
+summary(mlr_models)
+```
+
+```{r major+others}
+students %>% 
+  select(scholarship, major) %>%  
+  ggpairs() + 
+  theme_bw()
+
+students %>% 
+  select(parents, major) %>%  
+  ggpairs() + 
+  theme_bw()
+```
+
+```{r non-linear}
+# add natural log transformation to existing dataset
+students <- students %>%
+  mutate(log_scholarship =  log(scholarship))
+```
+
+```{r lm}
+model <- lm(debt ~ log_scholarship, data = students)
+summary(model)
+```
+
+
